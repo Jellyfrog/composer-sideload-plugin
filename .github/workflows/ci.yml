@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['8.4']
+        php: ['8.4', '8.5']
     name: PHP ${{ matrix.php }}
     steps:
       - uses: actions/checkout@v4
@@ -23,18 +23,5 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
 
       - run: vendor/bin/phpunit
-
-  phpstan:
-    runs-on: ubuntu-latest
-    name: PHPStan
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          coverage: none
-
-      - run: composer install --no-interaction --prefer-dist
 
       - run: vendor/bin/phpstan analyse
