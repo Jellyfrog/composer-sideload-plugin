@@ -8,14 +8,14 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Plugin\SeparateFile\SideloadInstaller;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SideloadInstaller::class)]
 class SideloadInstallerTest extends TestCase
 {
     private string $tempDir;
-    private Composer&MockObject $composer;
-    private IOInterface&MockObject $io;
+    private Composer $composer;
     private SideloadInstaller $installer;
 
     protected function setUp(): void
@@ -23,17 +23,14 @@ class SideloadInstallerTest extends TestCase
         $this->tempDir = sys_get_temp_dir() . '/composer-sideload-test-' . uniqid();
         mkdir($this->tempDir . '/vendor', 0777, true);
 
-        $config = $this->createMock(Config::class);
-        $config->method('get')
-            ->with('vendor-dir')
-            ->willReturn($this->tempDir . '/vendor');
+        $config = $this->createStub(Config::class);
+        $config->method('get')->willReturn($this->tempDir . '/vendor');
 
-        $this->composer = $this->createMock(Composer::class);
+        $this->composer = $this->createStub(Composer::class);
         $this->composer->method('getConfig')->willReturn($config);
 
-        $this->io = $this->createMock(IOInterface::class);
-
-        $this->installer = new SideloadInstaller($this->composer, $this->io);
+        $io = $this->createStub(IOInterface::class);
+        $this->installer = new SideloadInstaller($this->composer, $io);
     }
 
     protected function tearDown(): void
@@ -67,6 +64,14 @@ class SideloadInstallerTest extends TestCase
     private function pluginsFilePath(): string
     {
         return $this->tempDir . '/composer-plugins.json';
+    }
+
+    private function createInstallerWithMockIo(): array
+    {
+        $io = $this->createMock(IOInterface::class);
+        $installer = new SideloadInstaller($this->composer, $io);
+
+        return [$installer, $io];
     }
 
     public function testGetPluginsFilePath(): void
@@ -163,11 +168,13 @@ class SideloadInstallerTest extends TestCase
 
     public function testRemoveFromPluginsFileWarnsWhenNoFile(): void
     {
-        $this->io->expects($this->once())
+        [$installer, $io] = $this->createInstallerWithMockIo();
+
+        $io->expects($this->once())
             ->method('writeError')
             ->with($this->stringContains('No composer-plugins.json found'));
 
-        $this->installer->removeFromPluginsFile('psr/log');
+        $installer->removeFromPluginsFile('psr/log');
     }
 
     public function testInstallPluginPackagesReturnsZeroWhenNoRequires(): void
@@ -179,11 +186,13 @@ class SideloadInstallerTest extends TestCase
 
     public function testInstallPluginPackagesOutputsMessageWhenNoRequires(): void
     {
-        $this->io->expects($this->once())
+        [$installer, $io] = $this->createInstallerWithMockIo();
+
+        $io->expects($this->once())
             ->method('writeError')
             ->with($this->stringContains('No sideloaded packages to install'));
 
-        $this->installer->installPluginPackages();
+        $installer->installPluginPackages();
     }
 
     public function testInstallPluginPackagesReturnsZeroWhenEmptyRequiresAndEmptyExtraAllowList(): void

@@ -52,11 +52,12 @@ final class SideloadInstaller
             throw new \RuntimeException('Failed to read ' . $path);
         }
 
-        /** @var array{require?: array<string, string>} $data */
         $data = json_decode($contents, true);
         if (!is_array($data)) {
             throw new \RuntimeException('Invalid JSON in ' . $path);
         }
+
+        /** @var array{require?: array<string, string>} $data */
 
         return $data['require'] ?? [];
     }

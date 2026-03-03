@@ -11,16 +11,18 @@ use Composer\Plugin\SeparateFile\Command\PluginRemoveCommand;
 use Composer\Plugin\SeparateFile\Command\PluginRequireCommand;
 use Composer\Plugin\SeparateFile\Command\PluginUpdateCommand;
 use Composer\Plugin\SeparateFile\SeparateFileCommandProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SeparateFileCommandProvider::class)]
 class SeparateFileCommandProviderTest extends TestCase
 {
     private SeparateFileCommandProvider $provider;
 
     protected function setUp(): void
     {
-        $composer = $this->createMock(Composer::class);
-        $io = $this->createMock(IOInterface::class);
+        $composer = $this->createStub(Composer::class);
+        $io = $this->createStub(IOInterface::class);
 
         $this->provider = new SeparateFileCommandProvider([
             'composer' => $composer,

@@ -12,9 +12,10 @@ use Composer\Plugin\SeparateFile\SeparateFileCommandProvider;
 use Composer\Plugin\SeparateFile\SeparateFilePlugin;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SeparateFilePlugin::class)]
 class SeparateFilePluginTest extends TestCase
 {
     private string $tempDir;
@@ -53,14 +54,12 @@ class SeparateFilePluginTest extends TestCase
         rmdir($dir);
     }
 
-    private function createComposerMock(): Composer&MockObject
+    private function createComposerStub(): Composer
     {
-        $config = $this->createMock(Config::class);
-        $config->method('get')
-            ->with('vendor-dir')
-            ->willReturn($this->tempDir . '/vendor');
+        $config = $this->createStub(Config::class);
+        $config->method('get')->willReturn($this->tempDir . '/vendor');
 
-        $composer = $this->createMock(Composer::class);
+        $composer = $this->createStub(Composer::class);
         $composer->method('getConfig')->willReturn($config);
 
         return $composer;
@@ -88,8 +87,8 @@ class SeparateFilePluginTest extends TestCase
 
     public function testActivateAndDeactivateDoNotThrow(): void
     {
-        $composer = $this->createComposerMock();
-        $io = $this->createMock(IOInterface::class);
+        $composer = $this->createComposerStub();
+        $io = $this->createStub(IOInterface::class);
         $plugin = new SeparateFilePlugin();
 
         $plugin->activate($composer, $io);
@@ -101,16 +100,15 @@ class SeparateFilePluginTest extends TestCase
 
     public function testOnPostInstallOrUpdateSkipsWhenNoPluginsFile(): void
     {
-        $composer = $this->createComposerMock();
+        $composer = $this->createComposerStub();
         $io = $this->createMock(IOInterface::class);
 
-        // writeError should never be called since plugins file doesn't exist
         $io->expects($this->never())->method('writeError');
 
         $plugin = new SeparateFilePlugin();
         $plugin->activate($composer, $io);
 
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
         $plugin->onPostInstallOrUpdate($event);
     }
 }

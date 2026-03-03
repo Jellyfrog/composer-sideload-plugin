@@ -7,16 +7,18 @@ namespace Composer\Plugin\SeparateFile\Tests\Command;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Plugin\SeparateFile\Command\PluginRemoveCommand;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(PluginRemoveCommand::class)]
 class PluginRemoveCommandTest extends TestCase
 {
     private PluginRemoveCommand $command;
 
     protected function setUp(): void
     {
-        $composer = $this->createMock(Composer::class);
-        $io = $this->createMock(IOInterface::class);
+        $composer = $this->createStub(Composer::class);
+        $io = $this->createStub(IOInterface::class);
 
         $this->command = new PluginRemoveCommand($composer, $io);
     }

@@ -7,17 +7,18 @@ namespace Composer\Plugin\SeparateFile\Tests\Command;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Plugin\SeparateFile\Command\PluginRequireCommand;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputArgument;
 
+#[CoversClass(PluginRequireCommand::class)]
 class PluginRequireCommandTest extends TestCase
 {
     private PluginRequireCommand $command;
 
     protected function setUp(): void
     {
-        $composer = $this->createMock(Composer::class);
-        $io = $this->createMock(IOInterface::class);
+        $composer = $this->createStub(Composer::class);
+        $io = $this->createStub(IOInterface::class);
 
         $this->command = new PluginRequireCommand($composer, $io);
     }
